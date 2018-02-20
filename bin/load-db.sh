@@ -1,4 +1,4 @@
-#!/usr/env bash
+#!/bin/bash
 
 psql $URL <<EOF
 DROP TABLE IF EXISTS ticket_prices;
