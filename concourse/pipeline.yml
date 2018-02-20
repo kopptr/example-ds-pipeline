@@ -12,21 +12,23 @@ resources:
         uri: https://github.com/kopptr/example-ds-pipeline.git
 
 jobs:
-   - name: print-first-bytes
-     plan:
-        - aggregate:
-           - get: example-ds-pipeline
-             trigger: true
-           - get: five-thirtyeight-data
-             trigger: true
-        - task: print-first-50-bytes
-          config:
-             platform: linux
-             image_resource:
-                type: docker-image
-                source: {repository: ubuntu}
-             inputs:
-                - name: five-thirtyeight-data
-             run:
-                path: head
-                args: ["-c", "80", "five-thirtyeight-data/nfl-ticket-prices/2014-average-ticket-price.csv"]
+  - name: load-database
+    plan:
+       - aggregate:
+          - get: example-ds-pipeline
+            trigger: true
+          - get: five-thirtyeight-data
+            trigger: true
+       - task: create-and-copy-csv
+         config:
+            platform: linux
+            image_resource:
+               type: docker-image
+               source: {repository: kopptr/postgres-resource}
+            inputs:
+               - name: five-thirtyeight-data
+               - name: example-ds-pipeline
+            params:
+               URL: ((postgres_url))
+            run:
+               path: example-ds-pipeline/bin/load-db.sh
