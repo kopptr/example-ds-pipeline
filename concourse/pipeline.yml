@@ -1,4 +1,10 @@
 ---
+resource_types:
+- name: postgres-table
+  type: docker-image
+  source:
+    repository: kopptr/postgres-resource
+
 resources:
    - name: five-thirtyeight-data
      type: git
@@ -10,6 +16,11 @@ resources:
      source:
         branch: master
         uri: https://github.com/kopptr/example-ds-pipeline.git
+   - name: ticket_prices_table
+     type: postgres-table
+     source:
+        base_name: ticket_prices
+        uri: ((postgres_url))
 
 jobs:
   - name: load-database
@@ -32,3 +43,4 @@ jobs:
                URL: ((postgres_url))
             run:
                path: example-ds-pipeline/bin/load-db.sh
+       - put: ticket_prices_table
